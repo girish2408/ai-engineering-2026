@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineering 2026 — Study Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0c10;
+    --bg2: #0f1218;
+    --bg3: #161b24;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --dim: #4a5068;
+    --teal: #00e5a0;
+    --teal-dim: rgba(0,229,160,0.12);
+    --teal-dim2: rgba(0,229,160,0.06);
+    --blue: #4da6ff;
+    --blue-dim: rgba(77,166,255,0.12);
+    --amber: #ffb347;
+    --amber-dim: rgba(255,179,71,0.12);
+    --purple: #b47fff;
+    --purple-dim: rgba(180,127,255,0.12);
+    --coral: #ff6b6b;
+    --coral-dim: rgba(255,107,107,0.12);
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; }
+  .hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 2rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .hero-label { font-family: var(--mono); font-size: 11px; color: var(--teal); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .hero-title { font-size: clamp(22px, 4vw, 36px); font-weight: 700; letter-spacing: -0.5px; }
+  .hero-title span { color: var(--teal); }
+  .hero-sub { font-size: 14px; color: var(--muted); margin-top: 6px; }
+
+  .stats-bar { display: flex; gap: 2rem; flex-wrap: wrap; align-items: center; }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--text); font-family: var(--mono); }
+  .stat-num.green { color: var(--teal); }
+  .stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .prog-wrap { background: rgba(255,255,255,0.06); border-radius: 99px; height: 5px; overflow: hidden; margin-top: 1.2rem; }
+  .prog-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--blue)); border-radius: 99px; transition: width 0.5s ease; }
+
+  .streak-badge {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--amber-dim); border: 1px solid rgba(255,179,71,0.3);
+    border-radius: 99px; padding: 8px 16px;
+    font-size: 13px; font-weight: 600; color: var(--amber);
+    white-space: nowrap;
+  }
+  .streak-fire { font-size: 16px; }
+
+  /* ── MAIN ── */
+  .main { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+  /* ── WEEK ── */
+  .week-block { margin-bottom: 3rem; }
+  .week-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 1.2rem; padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .week-pill {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    padding: 4px 12px; border-radius: 99px;
+    background: var(--teal-dim); color: var(--teal);
+    border: 1px solid rgba(0,229,160,0.2);
+    white-space: nowrap;
+  }
+  .week-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .week-dates { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .week-progress { margin-left: auto; font-size: 12px; color: var(--muted); font-family: var(--mono); }
+
+  /* ── DAY CARDS ── */
+  .days-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  @media (max-width: 700px) { .days-row { grid-template-columns: 1fr; } }
+
+  .day-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: pointer;
+  }
+  .day-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .day-card.completed { border-color: rgba(0,229,160,0.35); }
+  .day-card.active-day { border-color: rgba(77,166,255,0.5); box-shadow: 0 0 0 1px rgba(77,166,255,0.2); }
+  .day-card.locked { opacity: 0.5; }
+
+  .day-card-top {
+    padding: 1.2rem 1.2rem 1rem;
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .day-circle {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 13px; font-weight: 600;
+    border: 1.5px solid var(--border2); color: var(--muted);
+    background: var(--bg3);
+  }
+  .day-circle.done { background: var(--teal); color: #000; border-color: var(--teal); }
+  .day-circle.active { background: var(--blue-dim); color: var(--blue); border-color: rgba(77,166,255,0.4); }
+
+  .day-info { flex: 1; min-width: 0; }
+  .day-badge-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .badge { font-size: 10px; font-family: var(--mono); padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+  .badge-day { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+  .badge-today { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(77,166,255,0.3); }
+  .badge-done { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(0,229,160,0.3); }
+  .badge-locked { background: var(--bg3); color: var(--dim); border: 1px solid var(--border); }
+
+  .day-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .day-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  .day-divider { height: 1px; background: var(--border); margin: 0 1.2rem; }
+
+  .day-body { padding: 1rem 1.2rem 1.2rem; display: none; }
+  .day-body.open { display: block; }
+
+  /* tasks */
+  .section-label {
+    font-size: 10px; font-family: var(--mono); text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--dim); margin-bottom: 8px; margin-top: 14px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  .task-list { list-style: none; }
+  .task-list li {
+    font-size: 13px; color: var(--muted); padding: 5px 0;
+    display: flex; gap: 10px; align-items: flex-start; line-height: 1.5;
+    border-bottom: 1px solid var(--border);
+  }
+  .task-list li:last-child { border-bottom: none; }
+  .task-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border2); flex-shrink: 0; margin-top: 7px;
+  }
+
+  /* project box */
+  .project-box {
+    background: var(--teal-dim2); border: 1px solid rgba(0,229,160,0.15);
+    border-radius: 10px; padding: 10px 14px; margin-top: 4px;
+  }
+  .project-box p { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+  /* courses */
+  .course-list { display: flex; flex-direction: column; gap: 6px; }
+  .course-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 12px; text-decoration: none;
+    transition: border-color 0.2s;
+  }
+  .course-item:hover { border-color: var(--border2); }
+  .platform-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .course-item .course-name { font-size: 12px; color: var(--text); flex: 1; line-height: 1.4; }
+  .course-platform { font-size: 10px; font-family: var(--mono); }
+  .course-arrow { font-size: 12px; color: var(--dim); }
+
+  .dl-dot { background: #4da6ff; }
+  .dl-text { color: #4da6ff; }
+  .ztm-dot { background: #00e5a0; }
+  .ztm-text { color: #00e5a0; }
+  .udemy-dot { background: #ffb347; }
+  .udemy-text { color: #ffb347; }
+  .krish-dot { background: #ff6b6b; }
+  .krish-text { color: #ff6b6b; }
+
+  /* complete btn */
+  .btn-complete {
+    width: 100%; margin-top: 14px; padding: 10px;
+    border-radius: 10px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: var(--font);
+    border: 1px solid rgba(0,229,160,0.4); background: var(--teal-dim);
+    color: var(--teal);
+  }
+  .btn-complete:hover { background: var(--teal); color: #000; }
+  .btn-complete.done { background: var(--bg3); border-color: var(--border); color: var(--dim); }
+  .btn-complete.done:hover { border-color: rgba(255,107,107,0.4); background: var(--coral-dim); color: var(--coral); }
+
+  /* expand toggle */
+  .expand-btn {
+    width: 100%; padding: 0.65rem 1.2rem;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    background: none; border: none; border-top: 1px solid var(--border);
+    color: var(--dim); font-size: 12px; cursor: pointer; font-family: var(--font);
+    transition: color 0.2s;
+  }
+  .expand-btn:hover { color: var(--muted); }
+  .expand-arrow { transition: transform 0.2s; display: inline-block; }
+  .expanded .expand-arrow { transform: rotate(180deg); }
+
+  /* motivation */
+  .motivation-bar {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 12px 12px 0; padding: 1rem 1.2rem;
+    margin-bottom: 2.5rem; font-size: 14px; color: var(--muted);
+    line-height: 1.7;
+  }
+  .motivation-bar strong { color: var(--text); font-weight: 600; }
+
+  /* legend */
+  .legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* footer */
+  .footer { text-align: center; padding: 2rem; color: var(--dim); font-size: 12px; font-family: var(--mono); border-top: 1px solid var(--border); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div>
+        <div class="hero-label">// your roadmap</div>
+        <h1 class="hero-title">AI Engineering <span>2026</span></h1>
+        <p class="hero-sub">11 weeks · 22 curriculum days · ~77 real days · 2–3 hrs/day · all 7 days</p>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+        <div class="streak-badge"><span class="streak-fire">🔥</span> <span id="streakText">0-day streak</span></div>
+        <div class="stats-bar">
+          <div class="stat-item"><div class="stat-num green" id="statDone">0</div><div class="stat-lbl">Done</div></div>
+          <div class="stat-item"><div class="stat-num" id="statPct">0%</div><div class="stat-lbl">Progress</div></div>
+          <div class="stat-item"><div class="stat-num" id="statLeft">22</div><div class="stat-lbl">Remaining</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="motivation-bar" id="motivationBar">
+    <strong>Ready, Girish?</strong> You've built RAG at ENBD, shipped PropAgent, and you're deep in an MSAI. This plan formalises what you know and fills the gaps. Start Day 1, Week 1. Right now.
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Completed</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Today / Next up</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--border2)"></div> Upcoming</div>
+    <div class="legend-item"><div class="legend-dot dl-dot"></div> DeepLearning.AI</div>
+    <div class="legend-item"><div class="legend-dot ztm-dot"></div> Zero To Mastery</div>
+    <div class="legend-item"><div class="legend-dot udemy-dot"></div> Udemy</div>
+    <div class="legend-item"><div class="legend-dot krish-dot"></div> Krish Naik</div>
+  </div>
+
+  <div id="weekContainer"></div>
+</main>
+
+<footer class="footer">
+  AI Engineering 2026 · Built for Girish · Progress saved in browser · Start → Ship
+</footer>
+
+<script>
+const STORAGE_KEY = 'aie2026_v2_completed';
+const STREAK_KEY  = 'aie2026_v2_streak_dates';
+let completed = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+let streakDates = JSON.parse(localStorage.getItem(STREAK_KEY) || '{}');
+
+const curriculum = [
+  {
+    week: 1,
+    theme: "Foundations — LLMs & the AI Stack",
+    realDays: "Study days 1–7",
+    days: [
+      {
+        id: 1,
+        title: "Kickoff: AI Engineering 2.0",
+        subtitle: "Understand the landscape before you build",
+        tasks: [
+          "Set up your AI dev environment: Python 3.11+, uv/pip, VS Code, GitHub repo",
+          "Understand AI Engineering 2026 market: what companies are hiring for",
+          "Difference between ML Engineer, Data Scientist, and AI Engineer",
+          "Tour your four platforms — bookmark key courses for this plan",
+          "Read: Andrej Karpathy's 'Software 2.0' blog post (~20 min)"
+        ],
+        project: "Create a GitHub repo 'ai-engineering-2026'. Write a README with your 3 goals for this program. Commit daily — this becomes your portfolio.",
+        courses: [
+          { name: "AI Engineering: Building AI Apps with LangChain", platform: "ztm", url: "https://zerotomastery.io/courses/ai-application-development/" },
+          { name: "Generative AI with Large Language Models", platform: "dl", url: "https://www.deeplearning.ai/courses/generative-ai-with-llms/" }
+        ]
+      },
+      {
+        id: 2,
+        title: "AI Landscape, Python & AI Stack",
+        subtitle: "The layers every AI engineer must know",
+        tasks: [
+          "Python async patterns for AI: asyncio, concurrent API calls, rate limiting",
+          "REST APIs + FastAPI crash course (you know C#/Node — map it to Python)",
+          "LLM integration layers: raw API → SDKs → frameworks (LangChain) — when to use each",
+          "OpenAI API: chat completions, streaming, function calling — run all 3",
+          "Layers of the AI Engineering stack: data → model → orchestration → product"
+        ],
+        project: "FastAPI app with 3 endpoints: /chat (OpenAI), /stream (streaming response), /classify (structured output with JSON mode). Deploy locally.",
+        courses: [
+          { name: "AI Engineering: Building AI Apps with LangChain", platform: "ztm", url: "https://zerotomastery.io/courses/ai-application-development/" },
+          { name: "Learn FastAPI (+ MCP!) — ZTM", platform: "ztm", url: "https://zerotomastery.io/courses/learn-fastapi/" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 2,
+    theme: "LLMs, Embeddings & VectorDBs",
+    realDays: "Study days 8–14",
+    days: [
+      {
+        id: 3,
+        title: "LLMs, Embeddings & VectorDBs",
+        subtitle: "How language models think and remember",
+        tasks: [
+          "Transformer internals: attention mechanism, tokens, context windows, KV cache",
+          "Embeddings: dense vs sparse, cosine similarity, why they capture meaning",
+          "Vector databases: HNSW index, approximate nearest neighbour, namespaces — Qdrant setup",
+          "Model economics: GPT-4o vs Claude 3.5 Sonnet vs Gemini 1.5 — cost per 1M tokens",
+          "Run: embed 500 sentences, store in Qdrant, query top-5 similar"
+        ],
+        project: "ENBD Wealth FAQ Semantic Search: embed 100 product FAQs into Qdrant, build a simple search UI with FastAPI + vanilla JS.",
+        courses: [
+          { name: "Generative AI with Large Language Models", platform: "dl", url: "https://www.deeplearning.ai/courses/generative-ai-with-llms/" },
+          { name: "Vector Databases: from Embeddings to Apps", platform: "dl", url: "https://www.deeplearning.ai/short-courses/vector-databases-embeddings-applications/" },
+          { name: "Building Applications with Vector Databases", platform: "dl", url: "https://www.deeplearning.ai/courses/building-applications-vector-databases/" }
+        ]
+      },
+      {
+        id: 4,
+        title: "RAG, LangChain & Evals Intro",
+        subtitle: "Your core production skill — build it right",
+        tasks: [
+          "RAG pipeline architecture: ingest → chunk → embed → store → retrieve → generate",
+          "LangChain LCEL: chain syntax, document loaders, text splitters, retrievers",
+          "Hybrid search: BM25 + vector with EnsembleRetriever — why hybrid beats pure semantic",
+          "RAGAS framework: faithfulness, answer relevancy, context recall — run your first eval",
+          "Chunking strategies: fixed-size, semantic, recursive — test all 3 on same document"
+        ],
+        project: "RAG chatbot over ENBD mutual fund PDFs — answer questions with source citations + RAGAS score of ≥0.75 on 20 test questions.",
+        courses: [
+          { name: "Retrieval Augmented Generation (RAG)", platform: "dl", url: "https://www.deeplearning.ai/courses/retrieval-augmented-generation-rag/" },
+          { name: "LangChain for LLM Application Development", platform: "dl", url: "https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/" },
+          { name: "Ultimate RAG Bootcamp: LangChain + LangGraph + LangSmith", platform: "udemy", url: "https://www.udemy.com/course/ultimate-rag-bootcamp-using-langchainlanggraph-langsmith/" },
+          { name: "Building & Evaluating Advanced RAG", platform: "dl", url: "https://www.deeplearning.ai/short-courses/building-evaluating-advanced-rag/" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 3,
+    theme: "Agentic AI Foundations",
+    realDays: "Study days 15–21",
+    days: [
+      {
+        id: 5,
+        title: "Agentic AI Foundation",
+        subtitle: "From answering questions to taking actions",
+        tasks: [
+          "Four agentic design patterns: Reflection, Tool Use, Planning, Multi-Agent",
+          "ReAct loop: Reason → Act → Observe → Reason — build one from scratch",
+          "Tool calling: define tools with JSON schema, handle tool results, multi-step loops",
+          "Memory systems: in-context (chat history), external (vector DB), semantic, episodic",
+          "Reliability caveats: hallucinated tool calls, infinite loops, failure modes — plan for them"
+        ],
+        project: "ReAct wealth agent with 3 tools: get_fund_price(ticker), get_market_news(topic), calculate_returns(amount, rate, years). Multi-step reasoning to answer 'Should I invest in this fund today?'",
+        courses: [
+          { name: "Agentic AI — Andrew Ng (4 patterns + MCP + SQL labs)", platform: "dl", url: "https://learn.deeplearning.ai/courses/agentic-ai/" },
+          { name: "ZTM AI Agents Bootcamp (CrewAI + LangGraph + OpenAI Agents SDK)", platform: "ztm", url: "https://zerotomastery.io/courses/ai-agents-bootcamp/" },
+          { name: "Long-Term Agentic Memory with LangGraph", platform: "dl", url: "https://www.deeplearning.ai/short-courses/long-term-agentic-memory-with-langgraph/" }
+        ]
+      },
+      {
+        id: 6,
+        title: "Agent Orchestration & LangGraph",
+        subtitle: "State machines, routing, and production control flow",
+        tasks: [
+          "LangGraph core concepts: StateGraph, nodes, edges, conditional routing, cycles",
+          "Workflow state machines: define state schema with TypedDict, pass state between nodes",
+          "Conditional branches: if-else logic, dynamic routing based on confidence/intent",
+          "Routing with guardrails: input classification → route to specialist subgraph",
+          "Trajectory evaluations: score agent paths, not just final answers",
+          "Human-in-the-loop: interrupt, collect approval, resume graph execution"
+        ],
+        project: "LangGraph KYC Onboarding Agent: collect info → validate → assess risk profile → recommend 3 funds → output PDF summary. State persists across restarts (SQLite checkpointing).",
+        courses: [
+          { name: "AI Agents in LangGraph — Harrison Chase", platform: "dl", url: "https://www.deeplearning.ai/short-courses/ai-agents-in-langgraph/" },
+          { name: "LangChain: Agentic AI Engineering — Eden Marco (~19h)", platform: "udemy", url: "https://www.udemy.com/course/langchain/" },
+          { name: "Complete Agentic AI Bootcamp with LangGraph — Krish Naik", platform: "krish", url: "https://www.udemy.com/course/complete-agentic-ai-bootcamp-with-langgraph-and-langchain/" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 4,
+    theme: "LangSmith, AWS Deployment & Evals in Production",
+    realDays: "Study days 22–28",
+    days: [
+      {
+        id: 7,
+        title: "LangSmith & AWS Deployment",
+        subtitle: "Ship it, trace it, watch it in production",
+        tasks: [
+          "LangSmith tracing: instrument every LLM call, tool call, and chain run",
+          "Eval datasets in LangSmith: create golden Q&A pairs, run automated evals on CI",
+          "Debug deployed AI: identify slow nodes, high-cost chains, hallucination patterns",
+          "Dockerise your FastAPI + LangChain app: Dockerfile, docker-compose, health checks",
+          "Deploy to AWS: EC2 / App Runner / Lambda — set env vars, HTTPS, auto-scaling basics"
+        ],
+        project: "Deploy your Week 2 RAG chatbot to AWS App Runner with LangSmith tracing. Share a live HTTPS URL. LangSmith dashboard shows latency + cost per query.",
+        courses: [
+          { name: "Ultimate RAG Bootcamp (LangSmith module)", platform: "udemy", url: "https://www.udemy.com/course/ultimate-rag-bootcamp-using-langchainlanggraph-langsmith/" },
+          { name: "AWS Bedrock: Build & Scale GenAI Apps — ZTM", platform: "ztm", url: "https://zerotomastery.io/courses/learn-aws-bedrock/" },
+          { name: "LLMOps Industry Ready Projects — Krish Naik", platform: "krish", url: "https://www.krishnaik.in/liveclass2/LLMOPS-Industry-Ready-Projects?id=4" }
+        ]
+      },
+      {
+        id: 8,
+        title: "Evals & Guardrails in Production",
+        subtitle: "Trust but verify — always",
+        tasks: [
+          "Offline evals: RAGAS, DeepEval — run before every deploy in your CI pipeline",
+          "Online evals: LLM-as-judge on live traffic, thumbs up/down, shadow mode testing",
+          "Human-in-the-loop review: approval queues for high-stakes agent actions",
+          "Acute risk vs chronic drift: hallucination on a trade vs gradually degrading quality",
+          "Beyond RAG agent evals: trajectory scoring, tool-call accuracy, final-answer quality",
+          "Output guardrails: Pydantic schema validation, PII detection, refusal logic, rate limits"
+        ],
+        project: "Add production guardrails to your wealth RAG: block PII leakage, validate fund ticker format, add HITL for any sell/buy recommendation. Run DeepEval CI check on every push.",
+        courses: [
+          { name: "Red Teaming LLM Applications — DeepLearning.AI + Giskard", platform: "dl", url: "https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/" },
+          { name: "RAG-LLM Evals & Test Automation", platform: "udemy", url: "https://www.udemy.com/course/rag-llm-evaluation-ai-test/" },
+          { name: "Test AI & LLM App with DeepEval, RAGAs & Ollama", platform: "udemy", url: "https://www.udemy.com/course/ai-testing-deepeval-ragas-ollama/" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 5,
+    theme: "MCP & Context Engineering",
+    realDays: "Study days 29–35",
+    days: [
+      {
+        id: 9,
+        title: "MCP — Model Context Protocol",
+        subtitle: "The USB-C of AI tool integration",
+        tasks: [
+          "MCP fundamentals: what problem it solves vs ad-hoc REST tool calling",
+          "MCP architecture: host, client, server, tools, resources, prompts",
+          "Build an MCP server in Python with FastMCP — expose 3 ENBD wealth tools",
+          "Connect Claude Desktop to your local MCP server — test interactively",
+          "AI interoperability standards: A2A patterns, multi-model MCP routing"
+        ],
+        project: "ENBD MCP Server with 3 tools: get_portfolio(account_id), get_market_data(ticker), get_fund_details(isin). Connect to Claude Desktop. Demo: ask Claude about a portfolio without writing a single frontend.",
+        courses: [
+          { name: "MCP: Build Rich-Context AI Apps with Anthropic", platform: "dl", url: "https://www.deeplearning.ai/short-courses/mcp-build-rich-context-ai-apps-with-anthropic/" },
+          { name: "Build AI Apps with MCP Servers: Working with Box Files", platform: "dl", url: "https://www.deeplearning.ai/short-courses/build-ai-apps-with-mcp-server-working-with-box-files/" },
+          { name: "MCP Crash Course: Complete Model Context Protocol in a Day", platform: "udemy", url: "https://www.udemy.com/course/model-context-protocol/" },
+          { name: "Learn FastAPI (+ MCP!) — ZTM", platform: "ztm", url: "https://zerotomastery.io/courses/learn-fastapi/" }
+        ]
+      },
+      {
+        id: 10,
+        title: "Context Engineering",
+        subtitle: "Squeeze every token — cost, speed, quality",
+        tasks: [
+          "Four pillars mastery: instructions, memory, tools, context compression",
+          "Context compression methods: summarisation, map-reduce, selective retention",
+          "Sliding window management: handle 200K context without overflow or truncation bugs",
+          "Prompt caching (Anthropic / OpenAI): implement prefix caching, measure 60–85% latency drop",
+          "Semantic caching: cache LLM responses by embedding similarity — skip the API call entirely",
+          "Prompt caching hands-on: instrument your Week 4 RAG with caching, show cost reduction"
+        ],
+        project: "Retrofit your Week 2 RAG with: (1) prompt caching on the system prompt, (2) semantic cache on frequent queries, (3) sliding window for long conversations. LangSmith shows 40%+ cost drop.",
+        courses: [
+          { name: "Semantic Caching for AI Agents — DeepLearning.AI", platform: "dl", url: "https://learn.deeplearning.ai/courses/semantic-caching-for-ai-agents/" },
+          { name: "Full-Stack GenAI & Agentic AI Bootcamp (context engineering module)", platform: "krish", url: "https://www.krishnaik.in/liveclass2/genai?id=9" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 6,
+    theme: "Multi-Agent Systems & Multimodal AI",
+    realDays: "Study days 36–42",
+    days: [
+      {
+        id: 11,
+        title: "Multi-Agent Systems",
+        subtitle: "Orchestrate a team — supervisor, mesh, parallel",
+        tasks: [
+          "Multi-agent architectures: supervisor pattern, hierarchical, collaborative mesh",
+          "Subgraphs in LangGraph: compose agents as modular reusable nodes",
+          "Parallel execution: fan-out to multiple agents, fan-in to aggregate results",
+          "Circuit breakers and fallbacks: retry, degrade gracefully, alert when agent 2 fails",
+          "Workflow architecture design: when to split into agents vs one big chain"
+        ],
+        project: "3-agent stock research system: ResearchAgent (web search) + AnalysisAgent (quant calculations) + ReportAgent (write structured report). Runs in parallel, merged by supervisor. < 30 second end-to-end.",
+        courses: [
+          { name: "Agentic AI — Multi-Agent Pattern — Andrew Ng", platform: "dl", url: "https://learn.deeplearning.ai/courses/agentic-ai/" },
+          { name: "Complete Agentic AI Bootcamp with LangGraph — Krish Naik", platform: "krish", url: "https://www.udemy.com/course/complete-agentic-ai-bootcamp-with-langgraph-and-langchain/" },
+          { name: "ZTM AI Agents Bootcamp", platform: "ztm", url: "https://zerotomastery.io/courses/ai-agents-bootcamp/" }
+        ]
+      },
+      {
+        id: 12,
+        title: "Multimodal AI Engineering",
+        subtitle: "PDF, images, tables, video — all in one RAG",
+        tasks: [
+          "Extract structured data from PDFs and images with GPT-4o Vision / Claude 3.5",
+          "Multimodal RAG: index images + tables + text in the same Qdrant vector store",
+          "Image + text retrieval: CLIP embeddings, ColPali approach for document pages",
+          "Video understanding agents: frame extraction → captioning → temporal QA",
+          "Production considerations: cost per image token, caching, batch processing"
+        ],
+        project: "Multimodal RAG over ENBD Annual Report 2024 (PDF with tables, charts, images): ask financial questions, get answers with source page citations and highlighted figures.",
+        courses: [
+          { name: "Multimodal RAG: Chat with Videos — DeepLearning.AI", platform: "dl", url: "https://www.deeplearning.ai/short-courses/" },
+          { name: "LLMOps Industry Ready Projects (GPT-4V, LLaVA, Gemini) — Krish Naik", platform: "krish", url: "https://www.krishnaik.in/liveclass2/LLMOPS-Industry-Ready-Projects?id=4" },
+          { name: "Ultimate RAG Bootcamp (multimodal module)", platform: "udemy", url: "https://www.udemy.com/course/ultimate-rag-bootcamp-using-langchainlanggraph-langsmith/" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 7,
+    theme: "Personal Branding + Text-2-SQL & Local AI",
+    realDays: "Study days 43–49",
+    days: [
+      {
+        id: 13,
+        title: "Personal Branding + Text-2-SQL",
+        subtitle: "Ship and be seen — your portfolio is your interview",
+        tasks: [
+          "Text-2-SQL architecture: schema injection → SQL generation → validation → self-correction loop",
+          "Self-correcting SQL agents: execute → catch DB error → rewrite query → retry (max 3x)",
+          "SQL injection defenses: parameterized queries, schema whitelisting, output validation",
+          "LinkedIn: update headline to 'Senior GenAI Engineer | LangGraph · RAG · MCP · Azure OpenAI'",
+          "GitHub: pin 3 repos (wealth RAG, multi-agent, MCP server) — write architecture diagrams in README",
+          "GitHub portfolio storytelling: each repo tells a problem → solution → result story"
+        ],
+        project: "SQL agent for ENBD portfolio analytics: natural language → PostgreSQL → answer. 'Show top 5 equity holdings by YTD return' works end-to-end. Zero SQL injection vulnerabilities (tested).",
+        courses: [
+          { name: "Building Your Own Database Agent — DeepLearning.AI", platform: "dl", url: "https://www.deeplearning.ai/short-courses/building-your-own-database-agent/" },
+          { name: "Improving Accuracy of LLM Apps (SQL Agent module)", platform: "dl", url: "https://www.deeplearning.ai/short-courses/" },
+          { name: "ZTM Generative AI Career Hub", platform: "ztm", url: "https://zerotomastery.io/career-hubs/generative-ai/" }
+        ]
+      },
+      {
+        id: 14,
+        title: "SLMs & Local AI",
+        subtitle: "Run powerful models with zero cloud cost",
+        tasks: [
+          "Set up Ollama locally: pull llama3.1, mistral-nemo, phi3-mini, gemma3 — run all locally",
+          "Quantization deep dive: Q4_K_M vs Q8_0 vs F16 — quality vs speed vs RAM tradeoff",
+          "Build a local-first RAG: Ollama + LangChain + Qdrant — zero OpenAI key, fully offline",
+          "vLLM for production inference: OpenAI-compatible API server, batching, throughput",
+          "llama.cpp: when to use for edge deployment vs server-side inference",
+          "Local deployment patterns: privacy-first use cases (ENBD on-prem requirements)"
+        ],
+        project: "Privacy-first ENBD wealth chatbot: Phi-3 mini via Ollama + local Qdrant + LangChain. Zero cloud calls, runs on laptop. Benchmark vs GPT-4o-mini on 20 questions: quality + cost.",
+        courses: [
+          { name: "Local LLMs via Ollama & LM Studio — Practical Guide", platform: "udemy", url: "https://www.udemy.com/course/running-open-llms-locally-practical-guide/" },
+          { name: "Basic RAG with LangChain + Ollama — Krish Naik", platform: "krish", url: "https://www.udemy.com/course/agentic-rag-with-langchain-and-langgraph/" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 8,
+    theme: "Deep Work + Voice AI",
+    realDays: "Study days 50–56",
+    days: [
+      {
+        id: 15,
+        title: "Deep Work + Industry Case Studies",
+        subtitle: "Consolidate, publish, and study real failures",
+        tasks: [
+          "Deep work session: refactor your best project — clean code, add tests, improve README",
+          "Study 3 real production AI failures: what went wrong, root cause, how to prevent",
+          "Architecture tradeoff analysis: RAG vs fine-tuning, agents vs chains, sync vs streaming",
+          "Write and publish your first technical LinkedIn article (800+ words, with diagram)",
+          "Practice out loud: explain your multi-agent system design in 10 minutes to a mirror"
+        ],
+        project: "Publish a LinkedIn post about your multi-agent stock report system: architecture diagram + lessons learned + what you'd do differently. Aim for 500+ impressions.",
+        courses: [
+          { name: "ZTM AI Engineering (architecture tradeoffs sections)", platform: "ztm", url: "https://zerotomastery.io/courses/ai-application-development/" }
+        ]
+      },
+      {
+        id: 16,
+        title: "Voice AI",
+        subtitle: "AI that speaks and listens in real time",
+        tasks: [
+          "Real-time voice stack: Deepgram STT → LLM → ElevenLabs/Cartesia TTS → LiveKit WebRTC",
+          "Low-latency pipeline design: target <500ms end-to-end, where each ms comes from",
+          "Interruption handling: detect when user starts speaking mid-response, cut audio cleanly",
+          "Silence detection and turn-taking: VAD models, timing thresholds",
+          "Multi-turn context recovery: maintain conversation state across voice turns with LangGraph"
+        ],
+        project: "PropAgent Voice Bot: caller asks 'Show me 2BR apartments in Dubai Marina under 120K AED' → agent queries DB → responds in voice with top 3 results. End-to-end < 800ms.",
+        courses: [
+          { name: "Building AI Voice Agents for Production — LiveKit + DeepLearning.AI", platform: "dl", url: "https://www.deeplearning.ai/short-courses/building-ai-voice-agents-for-production/" },
+          { name: "AI Voice Agents with AWS — ZTM (Bedrock Nova Sonic)", platform: "ztm", url: "https://zerotomastery.io/courses/ai-voice-agents-with-aws/" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 9,
+    theme: "Advanced AI Engineering & Fine-Tuning",
+    realDays: "Study days 57–63",
+    days: [
+      {
+        id: 17,
+        title: "Advanced AI Engineering",
+        subtitle: "Cost, speed, and smart model routing at scale",
+        tasks: [
+          "Cost optimisation at scale: model tiering (Haiku/mini for simple, Sonnet/4o for complex)",
+          "Semantic caching systems: GPTCache / custom Redis cache with embedding similarity lookup",
+          "Smart model routing: intent classifier → route to cheapest model that can handle it",
+          "Async Python mastery: asyncio.gather, semaphores, rate-limit handling for 100 concurrent calls",
+          "Prompt compression: LLMLingua, selective context, summarisation — reduce tokens 60%+"
+        ],
+        project: "Routing layer for ENBD wealth bot: classify intent → simple FAQ → Haiku ($0.25/M) | complex analysis → Sonnet ($3/M). Measure 70%+ cost reduction vs always using Sonnet.",
+        courses: [
+          { name: "Efficient Inference with SGLang: Text & Image Generation", platform: "dl", url: "https://www.deeplearning.ai/short-courses/efficient-inference-with-sglang-text-and-image-generation/" },
+          { name: "Semantic Caching for AI Agents", platform: "dl", url: "https://learn.deeplearning.ai/courses/semantic-caching-for-ai-agents/" },
+          { name: "ZTM AI Engineering (advanced patterns)", platform: "ztm", url: "https://zerotomastery.io/courses/ai-application-development/" }
+        ]
+      },
+      {
+        id: 18,
+        title: "Fine-Tuning & Synthetic Data",
+        subtitle: "Make the model speak your domain's language",
+        tasks: [
+          "Fine-tune vs RAG decision framework: when does fine-tuning actually win?",
+          "LoRA and QLoRA: adapter layers, rank, alpha — parameter-efficient fine-tuning intuition",
+          "Synthetic data pipeline: GPT-4o generates 500 Q&A pairs from ENBD product docs",
+          "Data filtering and deduplication: clean your dataset before training",
+          "Fine-tune Phi-3 mini on Google Colab (free T4 GPU) on 200 ENBD Q&A pairs",
+          "Evaluate fine-tuned model: side-by-side vs base model on 30 test questions"
+        ],
+        project: "ENBD-tuned Phi-3 mini: fine-tuned on wealth product Q&A. Compare vs base model on tone, accuracy, and domain vocabulary. Document results in your GitHub README.",
+        courses: [
+          { name: "Fine-Tuning & RL for LLMs: Intro to Post-Training — DeepLearning.AI", platform: "dl", url: "https://www.deeplearning.ai/courses/fine-tuning-and-reinforcement-learning-for-llms-intro-to-post-training/" },
+          { name: "Finetuning Large Language Models — DeepLearning.AI", platform: "dl", url: "https://www.deeplearning.ai/short-courses/finetuning-large-language-models/" },
+          { name: "Intro to Fine-Tuning LLMs — ZTM", platform: "ztm", url: "https://zerotomastery.io/courses/fine-tuning-llms/" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 10,
+    theme: "RL + AI Security",
+    realDays: "Study days 64–70",
+    days: [
+      {
+        id: 19,
+        title: "Reinforcement Learning + AI Product Thinking",
+        subtitle: "Why DeepSeek-R1 works — and how to apply it",
+        tasks: [
+          "GRPO explained simply: group relative policy optimisation — how DeepSeek-R1 learns to reason",
+          "Reward design for agents: what makes a good vs bad reward function? sparse vs dense",
+          "Identify true AI use-cases: where AI adds value vs where it's over-engineering",
+          "Product success metrics for AI: latency, accuracy, cost/query, hallucination rate, user retention",
+          "Run a GRPO fine-tune experiment on DeepLearning.AI notebook (Wordle case study)"
+        ],
+        project: "Write a 1-page 'AI Product Proposal' for SalaryAgent (ENBD X): problem statement, AI approach, success metrics, failure modes, cost estimate. Could be a real internal pitch.",
+        courses: [
+          { name: "Reinforcement Fine-Tuning LLMs with GRPO — DeepLearning.AI", platform: "dl", url: "https://www.deeplearning.ai/short-courses/reinforcement-fine-tuning-llms-grpo/" },
+          { name: "Fine-Tuning & RL for LLMs (PPO + GRPO modules)", platform: "dl", url: "https://www.deeplearning.ai/courses/fine-tuning-and-reinforcement-learning-for-llms-intro-to-post-training/" }
+        ]
+      },
+      {
+        id: 20,
+        title: "AI Security",
+        subtitle: "Red-team your own systems before attackers do",
+        tasks: [
+          "Prompt injection attacks: direct (user overwrites system prompt) and indirect (from retrieved docs)",
+          "Hallucination drift risks: how models confidently make up ISIN codes, fund NAVs, regulations",
+          "Context poisoning defense: validate all retrieved content before injecting into context",
+          "Sandboxed tool execution: never let agents run arbitrary code without a sandbox",
+          "Red-team your wealth RAG: attempt 10 injection attacks, patch at least 7",
+          "OWASP Top 10 for LLMs: memorise and apply to your own projects"
+        ],
+        project: "Security audit report for your Week 2 RAG: 10 attack vectors tested, severity rating for each, fixes implemented. Add this to your GitHub — it shows production maturity.",
+        courses: [
+          { name: "Red Teaming LLM Applications — DeepLearning.AI + Giskard", platform: "dl", url: "https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/" },
+          { name: "LLM Reinforcement Learning Fine-Tuning (GRPO + Security section)", platform: "udemy", url: "https://www.udemy.com/course/llm-fine-tuning-grpo-sft-dpo-with-reinforcement-learning/" }
+        ]
+      }
+    ]
+  },
+  {
+    week: 11,
+    theme: "Capstone + Interview Showcase",
+    realDays: "Study days 71–77",
+    days: [
+      {
+        id: 21,
+        title: "Capstone Project",
+        subtitle: "Build a complete, production-ready AI product",
+        tasks: [
+          "Architecture: ENBD Wealth AI Agent — multimodal RAG + LangGraph + MCP + LangSmith",
+          "Components: PDF ingestion pipeline → Qdrant vector DB → LangGraph orchestration → voice output",
+          "Write architecture doc: data flow diagram, failure modes, latency budget, cost per query",
+          "Add auth (JWT), rate limiting (Redis), guardrails (Pydantic + PII detection)",
+          "Deploy to AWS with LangSmith monitoring — production-ready with health checks",
+          "Final polish: error handling, loading states, mobile-responsive UI"
+        ],
+        project: "ENBD Wealth AI Agent: Upload portfolio PDF → agent analyses it → LangGraph orchestrates research + calculation → recommends rebalancing → voice summary via ElevenLabs. Full-stack, deployed, monitored.",
+        courses: [
+          { name: "All previous courses applied — this is your build day", platform: "ztm", url: "https://zerotomastery.io/courses/ai-application-development/" },
+          { name: "LLMOps Industry Ready Projects — Krish Naik", platform: "krish", url: "https://www.krishnaik.in/liveclass2/LLMOPS-Industry-Ready-Projects?id=4" }
+        ]
+      },
+      {
+        id: 22,
+        title: "Interview Prep + Capstone Showcase",
+        subtitle: "Land the Delphi and Cleveland Clinic interviews",
+        tasks: [
+          "System design: walk through your capstone architecture in 15 minutes — practice 3x",
+          "STAR stories: ENBD RAG pipeline, multi-agent design, RAGAS eval, MCP server, PropAgent",
+          "Practice questions: 'Why RAG over fine-tuning?', 'How do you handle hallucinations in prod?', 'Design a streaming AI wealth advisor'",
+          "Record a 3-minute Loom demo of your capstone — add to LinkedIn, GitHub README",
+          "Live demo prep: run through 5 user scenarios without looking at notes",
+          "Portfolio review: all 10 projects visible, each with problem → solution → impact framing"
+        ],
+        project: "Mock interview with a peer or record yourself presenting capstone. Watch it back. Fix 3 things. Then apply to Delphi, Cleveland Clinic Abu Dhabi, and 3 more UAE Senior GenAI Engineer roles.",
+        courses: [
+          { name: "ZTM Generative AI Career Hub — interview prep section", platform: "ztm", url: "https://zerotomastery.io/career-hubs/generative-ai/" }
+        ]
+      }
+    ]
+  }
+];
+
+const quotes = [
+  "<strong>Welcome, Girish.</strong> You've built RAG at ENBD, shipped PropAgent, and you're doing an MSAI. This plan fills the gaps. Start Day 1 right now.",
+  "<strong>Keep going.</strong> Every Senior GenAI Engineer at Delphi and Cleveland Clinic Abu Dhabi started exactly where you are.",
+  "<strong>You're building a skill stack</strong> that 90% of UAE engineers don't have. Stay rare.",
+  "<strong>Consistency beats intensity.</strong> 2 focused hours today > 8 scattered hours next weekend.",
+  "<strong>The Delphi interview</strong> won't ask you theory — it'll ask for the system you built. Build it.",
+  "<strong>Streak is everything.</strong> Protecting a chain is psychologically easier than finding motivation from zero.",
+  "<strong>Day by day.</strong> The capstone on Week 11 is already inside you.",
+  "<strong>You built PropAgent on Railway.</strong> You can build anything on this list.",
+  "<strong>Your MSAI + this plan</strong> = unstoppable combination. Don't stop now.",
+  "<strong>Missing one day means nothing.</strong> Missing the lesson is the only real failure. Open it now.",
+];
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...completed]));
+  const today = new Date().toISOString().split('T')[0];
+  streakDates[today] = completed.size;
+  localStorage.setItem(STREAK_KEY, JSON.stringify(streakDates));
+}
+
+function getStreak() {
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 200; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    if (streakDates[key] !== undefined) streak++;
+    else if (i > 0) break;
+  }
+  return streak;
+}
+
+function getNextId() {
+  for (let i = 1; i <= 22; i++) if (!completed.has(i)) return i;
+  return 22;
+}
+
+function getMotivation() {
+  const done = completed.size;
+  if (done === 22) return "<strong>You did it. All 22 days.</strong> The Delphi and Cleveland Clinic interviews? You're ready. Go apply. Right now.";
+  const streak = getStreak();
+  if (streak >= 5) return `<strong>${streak}-day streak.</strong> This is what separates engineers who get hired from those who don't. Don't break the chain.`;
+  return quotes[(done + streak) % quotes.length];
+}
+
+function updateHeader() {
+  const done = completed.size;
+  const pct = Math.round((done / 22) * 100);
+  const streak = getStreak();
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statPct').textContent = pct + '%';
+  document.getElementById('statLeft').textContent = 22 - done;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('streakText').textContent = streak === 0 ? 'Start your streak' : streak + '-day streak';
+  document.getElementById('motivationBar').innerHTML = getMotivation();
+}
+
+function toggleDay(id) {
+  const body = document.getElementById('body-' + id);
+  const btn = document.getElementById('expand-' + id);
+  const isOpen = body.classList.contains('open');
+  // close all
+  document.querySelectorAll('.day-body.open').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.expand-btn.expanded').forEach(b => b.classList.remove('expanded'));
+  if (!isOpen) {
+    body.classList.add('open');
+    btn.classList.add('expanded');
+  }
+}
+
+function toggleComplete(id, e) {
+  e.stopPropagation();
+  if (completed.has(id)) completed.delete(id);
+  else {
+    completed.add(id);
+    const today = new Date().toISOString().split('T')[0];
+    streakDates[today] = (streakDates[today] || 0) + 1;
+  }
+  saveState();
+  render();
+}
+
+const platformConfig = {
+  dl:    { label: 'DeepLearning.AI', cls: 'dl' },
+  ztm:   { label: 'Zero To Mastery', cls: 'ztm' },
+  udemy: { label: 'Udemy', cls: 'udemy' },
+  krish: { label: 'Krish Naik', cls: 'krish' },
+};
+
+function render() {
+  updateHeader();
+  const nextId = getNextId();
+  const container = document.getElementById('weekContainer');
+  container.innerHTML = '';
+
+  curriculum.forEach(week => {
+    const weekDone = week.days.filter(d => completed.has(d.id)).length;
+    const weekEl = document.createElement('div');
+    weekEl.className = 'week-block';
+    weekEl.innerHTML = `
+      <div class="week-header">
+        <span class="week-pill">Week ${week.week}</span>
+        <div>
+          <div class="week-title">${week.theme}</div>
+          <div class="week-dates">${week.realDays}</div>
+        </div>
+        <div class="week-progress">${weekDone}/2 days done</div>
+      </div>
+      <div class="days-row" id="week-${week.week}-days"></div>
+    `;
+    container.appendChild(weekEl);
+
+    const daysRow = weekEl.querySelector(`#week-${week.week}-days`);
+    week.days.forEach(day => {
+      const isDone = completed.has(day.id);
+      const isNext = day.id === nextId;
+      const isLocked = day.id > nextId + 1;
+      const circleClass = isDone ? 'done' : isNext ? 'active' : '';
+      const cardClass = isDone ? 'completed' : isNext ? 'active-day' : isLocked ? 'locked' : '';
+
+      const badgeHtml = isDone
+        ? `<span class="badge badge-done">✓ completed</span>`
+        : isNext
+          ? `<span class="badge badge-today">▶ next up</span>`
+          : isLocked
+            ? `<span class="badge badge-locked">locked</span>`
+            : `<span class="badge badge-day">Day ${day.id}</span>`;
+
+      const taskItems = day.tasks.map(t =>
+        `<li><span class="task-dot"></span>${t}</li>`
+      ).join('');
+
+      const courseItems = day.courses.map(c => {
+        const p = platformConfig[c.platform];
+        return `<a href="${c.url}" target="_blank" class="course-item">
+          <span class="platform-dot ${p.cls}-dot"></span>
+          <span class="course-name">${c.name}</span>
+          <span class="course-platform ${p.cls}-text">${p.label}</span>
+          <span class="course-arrow">↗</span>
+        </a>`;
+      }).join('');
+
+      const btnText = isDone ? '✓ Mark as incomplete' : isLocked ? 'Complete previous days first' : 'Mark Day ' + day.id + ' complete ✓';
+      const btnCls = isDone ? 'btn-complete done' : 'btn-complete';
+      const btnDisabled = isLocked ? 'disabled style="opacity:0.4;cursor:default;"' : '';
+
+      const card = document.createElement('div');
+      card.className = `day-card ${cardClass}`;
+      card.id = `card-${day.id}`;
+      card.innerHTML = `
+        <div class="day-card-top" onclick="toggleDay(${day.id})">
+          <div class="day-circle ${circleClass}">${isDone ? '✓' : day.id}</div>
+          <div class="day-info">
+            <div class="day-badge-row">
+              <span class="badge badge-day">Day ${day.id}</span>
+              ${badgeHtml !== `<span class="badge badge-day">Day ${day.id}</span>` ? badgeHtml : ''}
+            </div>
+            <div class="day-title">${day.title}</div>
+            <div class="day-sub">${day.subtitle}</div>
+          </div>
+        </div>
+        <div class="day-divider"></div>
+        <div class="day-body" id="body-${day.id}">
+          <div class="section-label">What you'll do</div>
+          <ul class="task-list">${taskItems}</ul>
+          <div class="section-label">Build project</div>
+          <div class="project-box"><p>${day.project}</p></div>
+          <div class="section-label">Courses for this day</div>
+          <div class="course-list">${courseItems}</div>
+          <button class="${btnCls}" ${btnDisabled} onclick="toggleComplete(${day.id}, event)">${btnText}</button>
+        </div>
+        <button class="expand-btn" id="expand-${day.id}" onclick="toggleDay(${day.id})">
+          <span>view details</span><span class="expand-arrow">⌄</span>
+        </button>
+      `;
+      daysRow.appendChild(card);
+    });
+  });
+
+  // auto-open next day
+  const nextBody = document.getElementById('body-' + nextId);
+  const nextBtn = document.getElementById('expand-' + nextId);
+  if (nextBody && !nextBody.classList.contains('open')) {
+    nextBody.classList.add('open');
+    if (nextBtn) nextBtn.classList.add('expanded');
+  }
+}
+
+render();
+</script>
+</body>
+</html>
