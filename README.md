@@ -58,6 +58,7 @@ Study notes are in the [`notes/`](notes/) folder, one file per study session.
 | Date | Topics |
 |------|--------|
 | [2026-05-05](notes/2026-05-05.md) | Jupyter notebooks, venv, requests/httpx, pandas (Series, DataFrames, filtering, groupby, time series) |
+| [2026-05-06](notes/2026-05-06.md) | LLM foundations, transformers, tokens/context/cost, LLM APIs, pretraining datasets, FineWeb, CommonCrawl, BPE tokenization, gradient descent, SFT, RLHF, RLHF vs RL |
 
 ---
 
