@@ -59,6 +59,7 @@ Study notes are in the [`notes/`](notes/) folder, one file per study session.
 |------|--------|
 | [2026-05-05](notes/2026-05-05.md) | Jupyter notebooks, venv, requests/httpx, pandas (Series, DataFrames, filtering, groupby, time series) |
 | [2026-05-06](notes/2026-05-06.md) | LLM foundations, transformers, tokens/context/cost, LLM APIs, pretraining datasets, FineWeb, CommonCrawl, BPE tokenization, gradient descent, SFT, RLHF, RLHF vs RL |
+| [2026-05-09](notes/2026-05-09.md) | LLMs with internet (search, code interpreter, deep research), FastAPI (ASGI, Pydantic, auth, Swagger), fastapi-mcp, OpenAI Chat Completions, temperature, seed, base64 images, streaming, system/user prompts |
 
 ---
 
