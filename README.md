@@ -62,6 +62,7 @@ Study notes are in the [`notes/`](notes/) folder, one file per study session.
 | [2026-05-09](notes/2026-05-09.md) | LLMs with internet (search, code interpreter, deep research), FastAPI (ASGI, Pydantic, auth, Swagger), fastapi-mcp, OpenAI Chat Completions, temperature, seed, base64 images, streaming, system/user prompts |
 | [2026-05-11](notes/2026-05-11.md) | Chat API params (top_p, max_tokens, n, stop, frequency_penalty, presence_penalty), reasoning models, Whisper STT, TTS (voices/formats), DALL-E generate/variation/edit, prompt engineering (RTF, zero/few-shot, step-by-step, hallucination guarding) |
 | [2026-05-13](notes/2026-05-13.md) | Gemini API (integration, streaming, image input), GenerationConfig (candidate_count, stop_sequences, max_output_tokens, temperature, top_p, top_k), generate_content vs start_chat, get_model (token limits, defaults), count_tokens |
+| [2026-05-18](notes/2026-05-18.md) | LangChain (data-aware, agentic), use cases, components (LLM wrappers, prompts, indexes, memory), chains, agents, caching (in-memory/SQLite), streaming, PromptTemplate vs ChatPromptTemplate, LCEL, tools, ReAct agent (LangChain Hub, AgentExecutor, handle_parsing_errors, tool selection) |
 
 ---
 
