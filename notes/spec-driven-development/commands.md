@@ -1,274 +1,450 @@
 # SDD Commands & Workflow
 
-**Topic:** The five core commands that drive a spec-driven development workflow — and two optional quality gates
+**Topic:** The five core commands and two optional quality gates that drive spec-driven development — with detail on each phase, what artifacts are produced, and why each step exists
 
 ---
 
-## Overview
-
-In SDD, you work through a set of commands in a deliberate sequence. Each command is a prompt you run against a coding agent. Each builds on the output of the previous one. The pipeline moves from high-level principles down to actual code.
+## Visual Workflow
 
 ```
-INITIAL BUILD (first time for a new project)
-─────────────────────────────────────────────
-constitution → specify → [clarify] → plan → tasks → [analyze] → implement
+INITIAL BUILD (new project)
+────────────────────────────────────────────────────────────────
+/constitution → /specify → /plan → /tasks → /implement
+                    ↓                  ↓
+                /clarify           /analyze
+               (optional)         (optional)
 
-ADDING A NEW FEATURE (project already exists)
-──────────────────────────────────────────────
-specify → [clarify] → plan → tasks → [analyze] → implement
+ADDING A NEW FEATURE (project already set up)
+────────────────────────────────────────────────────────────────
+/specify → /plan → /tasks → /implement
+    ↓                 ↓
+/clarify           /analyze
 ```
 
-The bracketed commands — `clarify` and `analyze` — are optional quality gates. Run them when the feature is complex or the spec is long.
+**/constitution** and **/specify** are the two entry points (bright purple in the diagram — they require your direct input). The rest of the pipeline is agent-driven, with you in a review/approval role.*
 
 ---
 
-## 1. `constitution` — Core Binding Principles
+## Why This Pipeline Exists
 
-**Run once per project.** The constitution command instructs the coding agent to take the high-level principles you have outlined and flesh them out into a full, formal `constitution.md` file for the application.
+Before diving into each command, it helps to understand the two core problems SDD solves.
 
-The constitution is the root document of the entire project. Every other command (specify, plan, tasks, implement) is run *in the context of* the constitution. It defines what the application *must always be* — the rules that cannot be overridden by any individual feature.
+### Problem 1: Context Decay Between Sessions
 
-### What goes in a constitution
+AI agents have no memory across sessions. Every new session starts cold. Without a written spec, the agent re-derives architectural decisions, makes subtly different choices, and the codebase slowly drifts from the original intent. This is **context decay** — the gradual erosion of project intent through repeated re-explanation.
 
-- Application mission and north star
-- Core architectural decisions (tech stack, folder structure conventions)
-- Non-negotiable constraints (performance budgets, security rules, accessibility standards, compliance requirements)
-- Coding standards (language versions, style guides, test coverage requirements)
-- What the application must never do
+SDD solves this by externalising intent into version-controlled files. The constitution, specs, plans, and task lists travel with the code. Any agent in any session picks up full context in seconds by reading those files.
 
-### Example
+### Problem 2: The Ambiguity Tax
 
-You might write in your notes:
+Vague prompts force agents to fill gaps with their best guess — statistically probable but often wrong. The **ambiguity tax** is the rework cost of those wrong guesses discovered during or after implementation.
 
-```
-Principles to encode in the constitution:
-- Application must meet WCAG 2.1 AA accessibility standards
-- All API responses must be under 500ms at p95
-- No PII may be written to logs
-- All endpoints must be authenticated via JWT
-- Tech stack: FastAPI, React 18, PostgreSQL, Docker
-```
-
-You then run the constitution prompt:
-
-```
-Prompt to agent:
-"Read the principles below and produce a full constitution.md for this application.
-The constitution must define binding rules under these headings: Mission, Tech Stack,
-Architectural Constraints, Security Rules, Performance Budgets, Accessibility Standards,
-Coding Standards, Out of Scope. Flag anything underspecified.
-
-Principles: [paste your notes]"
-```
-
-The agent produces `constitution.md`. You review it, adjust anything that was mis-stated, and lock it. From this point on, every other agent session starts by reading this file.
+SDD moves ambiguity resolution to the *earliest possible stage* — at spec time, before any plan or code is written. Clarifying questions get asked and answered when the cost is near zero (updating a markdown file) rather than high (rewriting implemented code).
 
 ---
 
-## 2. `specify` — High-Level Feature Specification
+## The Three-File Standard
 
-**Run once per new feature.** The specify command produces a high-level specification document for a single feature. This is intentionally high-level — it captures *what* the feature does, *who* it serves, and *what success looks like*, without prescribing implementation details.
-
-### What a spec covers
-
-- Feature name and one-line description
-- User story / goal
-- Inputs and outputs (what the user provides, what they receive)
-- Acceptance criteria (the checklist that defines "done")
-- Constraints specific to this feature
-- What is explicitly out of scope for this feature
-
-### Example
+Most SDD platforms (Kiro/AWS, GitHub Spec Kit, Tessl) converge on the same three-file structure per feature:
 
 ```
-Prompt to agent:
-"I want to add a dashboard page that shows a user's portfolio stats:
-total portfolio value, asset allocation breakdown (equity/bond/cash), 
-top 5 performing funds this month, and a 30-day performance sparkline.
-The data comes from our existing /api/portfolio endpoint.
-
-Produce a feature spec for this dashboard page following our constitution.
-Include: goal, user story, inputs/outputs, acceptance criteria, constraints, out of scope."
+specs/
+  [feature-name]/
+    spec.md      ← WHAT: requirements, user story, acceptance criteria
+    plan.md      ← HOW: technical approach, architecture, data models
+    tasks.md     ← STEPS: ordered, atomic coding tasks
+constitution.md  ← ALWAYS: binding principles for the whole project
 ```
 
-The agent produces `features/dashboard/spec.md`. You review it. If anything is off, you correct the spec — not the agent in a back-and-forth. The spec is the artefact.
+Each file is committed alongside code. A PR is incomplete without the spec that drove it.
 
 ---
 
-## 3. `clarify` — Resolve Underspecified Areas *(optional)*
+## 1. `/constitution` — Core Binding Principles
 
-**Run after `specify`, before `plan`.** The clarify command instructs the agent to read the spec you just produced and identify any areas that are ambiguous, underspecified, or could be interpreted in more than one way. The agent asks you targeted questions. You answer them. The spec is updated.
+**Run once per project.** When you run `/constitution`, the agent reads the principles you have written down and produces or updates a formal `constitution.md` file. This file is the root document of the entire project. Every other command runs in its context.
 
-This command exists because specs written quickly will have gaps. It is better for the agent to surface those gaps *before* a plan is written than to discover them during implementation.
+### What the constitution is
 
-### What clarify does
+The constitution is equivalent to a **CLAUDE.md** file — the project-wide standing instruction that an agent reads at the start of every session before doing anything else. It defines the rules that cannot be overridden by any individual feature. It is the boundary.
 
-- Reads the feature spec
-- Lists every ambiguity or missing detail it finds
-- Asks you specific questions, one per gap
-- You answer; the spec is updated with your answers
-- Result: a tighter, more complete spec before any planning begins
+When you run `/constitution` and tell it "the application should have WCAG accessibility standards", the agent doesn't just note that — it encodes it as a binding principle with specific rules and checkable criteria. It may also update related templates (e.g. the spec template to include an accessibility acceptance criterion section, or a checklist that runs on every feature).
 
-### Example interaction
+### What it contains
 
+```markdown
+# Project Constitution
+
+## Mission
+One or two sentences: what the application does and what it must never do.
+e.g. "Deliver accurate fund data to wealth advisors. Never fabricate financial figures."
+
+## Tech Stack
+Locked choices: language, framework, database, versions.
+e.g. "Python 3.12 · FastAPI 0.111 · PostgreSQL 16 · React 18 · Docker"
+
+## Architectural Constraints
+Module boundaries, dependency rules, folder structure conventions.
+e.g. "No circular imports. Business logic lives in /services, not /routes."
+
+## Security Rules
+Non-negotiable security requirements.
+e.g. "No PII in logs. All endpoints require JWT. No secrets in source."
+
+## Performance Budgets
+Hard limits.
+e.g. "API p95 response < 500ms. Frontend LCP < 2.5s."
+
+## Accessibility Standards
+e.g. "All UI must meet WCAG 2.1 AA. All interactive elements keyboard-navigable."
+
+## Coding Standards
+Style, test coverage, documentation requirements.
+e.g. "Black formatter, 80% test coverage minimum, no `any` in TypeScript."
+
+## Out of Scope (Global)
+What will never be built in this project.
 ```
-Agent (running clarify on the dashboard spec):
 
-Questions:
-1. The sparkline shows 30-day performance — should this be based on NAV change,
-   percentage return, or absolute return in AED?
-2. "Top 5 performing funds this month" — performing relative to what benchmark?
-   Absolute return or return vs category average?
-3. Should the dashboard be visible to all user roles, or only users with
-   a linked portfolio? What should unauthenticated users see?
-4. Is the asset allocation chart interactive (clickable to drill down)
-   or purely visual?
-5. What should the page show if the /api/portfolio endpoint returns an error?
+### Best practices for constitution files
 
-Please answer each question and I will update the spec.
-```
+- Keep it concise (150–200 lines is the practical limit before agents start missing things)
+- Use headers for organisation, prose for intent, code snippets for unambiguous examples
+- Do **not** document file paths — they change. Document patterns and capabilities instead
+- Cross-tool: the same principles live in `CLAUDE.md` (Claude Code), `.cursorrules` (Cursor), and `.github/copilot-instructions.md` (GitHub Copilot). A pre-commit hook can keep them in sync
 
-You answer the five questions. The agent updates `spec.md` with your answers baked in as hard requirements. Now the spec has no gaps.
+### What the agent does when you run `/constitution`
+
+1. Reads the principles you have provided
+2. Produces or updates `constitution.md` with those principles encoded formally
+3. Updates any related templates (e.g. the default spec template, checklists) to reflect the new principles
+4. Flags anything underspecified: "You mentioned 'clean code' — do you want to specify a formatter, linter, or style guide?"
 
 ---
 
-## 4. `plan` — Technical Implementation Plan
+## 2. `/specify` — Feature Specification
 
-**Run after `specify` (and `clarify` if used).** The plan command instructs the agent to read the feature spec and the constitution, and produce a concrete technical plan for *how* to implement the feature. This is where the agent's technical knowledge is applied — it decides the architecture, the components, the data flow, the file structure.
+**Run once per new feature.** The specify command creates a structured specification for a single feature. This is intentionally high-level — it captures *what* the feature does, *who* it serves, and *what success looks like*, without prescribing implementation details.
 
-You do not write the plan. The agent writes it based on your spec and constitution.
+### What the spec file contains
 
-### What a plan covers
+Running `/specify` produces `specs/[feature]/spec.md` with these sections:
 
-- Technical approach and architecture decisions
-- Files to create or modify, with their purpose
-- Data flow from input to output
-- API contracts (if new endpoints are needed)
-- State management approach (if frontend)
-- External dependencies introduced
-- Testing approach
-
-### Example
-
+**User story**
+Who the user is, what they want to do, and why.
 ```
-Prompt to agent:
-"Read constitution.md and features/dashboard/spec.md.
-Produce a detailed technical implementation plan for the dashboard feature.
-Include: architecture decisions, file list (create/modify), data flow diagram,
-component breakdown, API changes if any, and testing approach."
+As a wealth advisor, I want to see a dashboard of my client's portfolio stats
+so that I can quickly answer questions about allocation and performance without
+opening a PDF.
 ```
 
-The agent produces `features/dashboard/plan.md`. You review it for soundness — does it align with the constitution? Does it introduce anything that violates a constraint? If yes, you update the spec or the plan accordingly. You are not debugging code — you are reviewing a blueprint.
+**Functional requirements**
+What the system must do — concrete, observable behaviours.
+```
+- Display total portfolio value in AED, updated daily
+- Show asset allocation breakdown: equity / bond / cash as percentages
+- List top 5 performing funds this month by absolute return
+- Show a 30-day performance sparkline (% return)
+```
+
+**Key entities**
+The domain objects involved.
+```
+Portfolio, Fund, AssetAllocation, PerformanceHistory
+```
+
+**Edge cases**
+Boundary conditions the implementation must handle.
+```
+- Portfolio with zero funds → show empty state, not an error
+- API returns stale data (>24h old) → show a staleness warning
+- All funds are in the same asset class → allocation shows 100%
+```
+
+**Assumptions**
+Dependencies and constraints that are taken as given.
+```
+- /api/portfolio endpoint exists and returns data in the agreed schema
+- User is already authenticated before reaching the dashboard
+- Performance data is available for all funds in the portfolio
+```
+
+**Success criteria**
+The checklist that defines "done". Each item is measurable and binary.
+```
+- [ ] Dashboard renders all 4 components when portfolio data loads
+- [ ] Empty state shown when portfolio has no funds
+- [ ] Staleness warning shown when data is >24h old
+- [ ] All interactive elements keyboard-navigable (WCAG AA)
+- [ ] Page load < 1.5s on a simulated 4G connection
+- [ ] All 12 unit and integration tests pass
+```
+
+**Quality gates (built into specify)**
+
+The specify command also runs a built-in checklist before finalising the spec:
+
+| Gate | Check |
+|------|-------|
+| Requirement completeness | Are all functional requirements specific and testable? |
+| Feature readiness | Are all dependencies (APIs, data) confirmed to exist? |
+| Validation coverage | Does each requirement have at least one acceptance criterion? |
+| Edge case coverage | Are failure states and boundary conditions addressed? |
+| Constitution alignment | Does this feature violate any constitution rule? |
+
+If any gate fails or has outstanding doubts, the spec is flagged — not silently passed.
 
 ---
 
-## 5. `tasks` — Actionable Coding Task List
+## 3. `/clarify` — Resolve Ambiguities *(optional, runs after `/specify`)*
 
-**Run after `plan`.** The tasks command instructs the agent to take the full technical plan and break it down into a logical, ordered list of discrete, actionable coding tasks. Each task is small enough to be implemented and verified independently.
+**Run after `/specify`, before `/plan`.** The clarify command reads the current spec and identifies anything ambiguous, underspecified, or open to more than one interpretation. The agent asks you targeted questions. You answer. The spec is updated with your answers encoded as hard requirements.
 
-The task list is what actually drives implementation. It is an ordered checklist — each item is a unit of work the agent can execute in a single session without needing to re-read the entire plan.
+### Why this matters
+
+Without clarify, ambiguities carry forward silently. The plan picks one interpretation, the tasks inherit it, and the implementation is based on an assumption you never approved. You discover the divergence late — in review, or in production.
+
+Clarify is cheap (a conversation at spec time). Finding the same issue in code review is expensive.
+
+### Example — clarify running on the dashboard spec
+
+```
+Agent (running /clarify on specs/dashboard/spec.md):
+
+I found 4 areas that need clarification before planning begins:
+
+Q1. Sparkline metric
+    The spec says "30-day performance sparkline (% return)" but does not
+    specify the baseline. Should this be:
+    (a) % change from 30 days ago to today
+    (b) cumulative daily return over the 30-day period
+    (c) return relative to the fund's benchmark index
+
+Q2. "Top 5 performing funds" definition
+    Performing relative to what? Options:
+    (a) Absolute return in AED over the current month
+    (b) Percentage return over the current month
+    (c) Return vs category average (alpha)
+
+Q3. Dashboard visibility
+    The spec assumes the user is authenticated, but does not state
+    what happens if the session expires mid-session on the dashboard.
+    Should the page: (a) redirect to login, (b) show a session timeout
+    modal with re-login option, (c) show cached data with a warning?
+
+Q4. Staleness threshold
+    The spec mentions a "staleness warning if data is >24h old" but the
+    constitution performance budget requires data to be refreshed daily.
+    Are these two constraints in conflict, or is 24h the correct threshold?
+
+Please answer each question. I will update spec.md accordingly.
+```
+
+You answer the four questions. The agent updates the spec with your answers as explicit requirements. The plan starts from a complete foundation.
+
+---
+
+## 4. `/plan` — Technical Implementation Plan
+
+**Run after `/specify` (and `/clarify` if used).** The plan command reads the feature spec and the constitution and produces a detailed technical plan for *how* to implement the feature. This is where the agent applies its technical knowledge — it designs the architecture, selects the components, defines the data flow, and records the rationale.
+
+You do not write the plan. You review it. Your job is to check that it aligns with the constitution and the spec — not to prescribe implementation details.
+
+### What you can direct in `/plan`
+
+You can give the agent specific technical preferences or constraints at plan time. These are things that matter for how it is built, not what is built:
+
+```
+/plan - use Tailwind for theme colours, reference tokens from tailwind.config.js
+        - use react-query for data fetching and caching
+        - use date-fns for date formatting, not moment.js
+        - use recharts for the sparkline (already installed)
+        - no tests needed for this feature (we will add them in Phase 2)
+```
+
+These preferences are encoded into the plan and cascade to the task list automatically.
+
+### What the plan produces
+
+Running `/plan` creates multiple files in the specs folder:
+
+**`specs/[feature]/plan.md`**
+The main plan document.
+```markdown
+## Technical Approach
+How the feature will be built: component tree, data flow, state management.
+
+## Principles
+Which constitution rules apply and how this plan respects them.
+
+## Tech Stack
+Libraries and versions used for this specific feature.
+
+## Project Structure
+New files to create, existing files to modify.
+
+## Prerequisites / Setup
+Anything that must exist before implementation begins.
+
+## Research
+Why specific decisions were made — rationale for library choices, architecture tradeoffs.
+```
+
+**`specs/[feature]/contracts.md`**
+The machine-readable interface contracts: API response schemas, TypeScript interfaces, function signatures. These act as the reference while modifying code — both human reviewers and the implementing agent check their output against contracts.
+
+```typescript
+// contracts.md
+interface PortfolioSummary {
+  totalValueAED: number;
+  lastUpdated: string;           // ISO 8601
+  allocation: AllocationBreakdown;
+  topFunds: FundPerformance[];
+  sparkline: SparklinePoint[];
+}
+
+interface AllocationBreakdown {
+  equity: number;   // percentage 0-100
+  bond: number;
+  cash: number;
+}
+```
+
+**`specs/[feature]/datamodel.md`**
+Entity definitions, relationships, validation rules, and database schema changes if any.
+
+---
+
+## 5. `/tasks` — Actionable Coding Task List
+
+**Run after `/plan`.** The tasks command reads the full plan and breaks it into an ordered list of discrete, atomic coding tasks. Each task is small enough to be implemented and verified in a single agent session.
+
+The task list is what the implementing agent works from. Every task has an ID, a clear objective, and defined inputs/outputs.
 
 ### What a task list looks like
 
 ```markdown
-# Dashboard Feature — Task List
+# Dashboard Feature — Tasks
 
-## Setup
-- [ ] T01: Create `src/pages/Dashboard.tsx` with placeholder component
-- [ ] T02: Add `/dashboard` route to `src/router.tsx`
-- [ ] T03: Create `src/hooks/usePortfolio.ts` — fetches from `/api/portfolio`
+## Wave 1: Foundation (no dependencies)
+- [ ] T01 — Create `src/hooks/usePortfolio.ts` · fetches from `/api/portfolio`,
+             returns { data, isLoading, isError, isStale } via react-query
+- [ ] T02 — Create `src/types/portfolio.ts` · TypeScript types from contracts.md
+- [ ] T03 — Add `/dashboard` route to `src/router.tsx`
 
-## Components
-- [ ] T04: Build `PortfolioValueCard` component (displays total value in AED)
-- [ ] T05: Build `AssetAllocationChart` component (pie chart, equity/bond/cash)
-- [ ] T06: Build `TopFundsList` component (top 5 funds, name + monthly return)
-- [ ] T07: Build `PerformanceSparkline` component (30-day line chart, % return)
+## Wave 2: Components (depends on T01, T02)
+- [ ] T04 — Build `PortfolioValueCard` · displays totalValueAED, staleness warning
+- [ ] T05 — Build `AssetAllocationChart` · recharts pie chart, equity/bond/cash
+- [ ] T06 — Build `TopFundsList` · ranked list, fund name + monthly % return
+- [ ] T07 — Build `PerformanceSparkline` · recharts LineChart, 30-day % return
 
-## Integration
-- [ ] T08: Wire `usePortfolio` hook into Dashboard page, handle loading/error states
-- [ ] T09: Pass portfolio data as props to all four sub-components
+## Wave 3: Integration (depends on Wave 2)
+- [ ] T08 — Assemble `Dashboard.tsx` · wire usePortfolio, render all 4 components
+- [ ] T09 — Handle loading state · skeleton loaders for each card
+- [ ] T10 — Handle empty state · EmptyPortfolio component when fund list is empty
+- [ ] T11 — Handle error state · error boundary with retry button
 
-## Testing
-- [ ] T10: Unit test `usePortfolio` hook — mock API success and error cases
-- [ ] T11: Unit test `AssetAllocationChart` renders correct segments
-- [ ] T12: Integration test: Dashboard renders all 4 components when data loads
-
-## Polish
-- [ ] T13: Add skeleton loaders for each card while data is fetching
-- [ ] T14: Add error boundary with fallback UI if API fails
-- [ ] T15: Verify WCAG 2.1 AA: all chart elements have aria-labels
+## Wave 4: Quality (depends on Wave 3)
+- [ ] T12 — Accessibility pass · aria-labels on all chart elements, keyboard nav
+- [ ] T13 — Performance check · verify LCP < 1.5s with Chrome DevTools
 ```
 
-### Example prompt
+### Key properties of a good task list
 
-```
-Prompt to agent:
-"Read constitution.md, features/dashboard/spec.md, and features/dashboard/plan.md.
-Turn the technical plan into an ordered list of small, actionable coding tasks.
-Each task should be completable in one focused session. Format as a markdown checklist.
-Group tasks by: Setup, Components, Integration, Testing, Polish."
-```
+| Property | Why it matters |
+|----------|---------------|
+| **Atomic** — one clear objective per task | Agent can complete in one session without re-reading entire plan |
+| **Ordered by dependency** — later tasks build on earlier | No task starts before its inputs exist |
+| **Grouped into waves** — independent tasks in the same wave | Tasks in the same wave can run in parallel (multiple agents) |
+| **Traceable** — each task maps to a spec requirement | Easy to verify nothing was missed |
+| **Sized for one session** — not too large, not trivial | Avoids context overflow and reduces WIP |
 
 ---
 
-## 6. `analyze` — Cross-Artifact Alignment Check *(optional)*
+## 6. `/analyze` — Cross-Artifact Alignment Check *(optional, runs after `/tasks`)*
 
-**Run after `tasks`, before `implement`.** The analyze command instructs the agent to read all artefacts produced so far — constitution, spec, plan, task list — and verify they are fully aligned. It looks for contradictions, gaps, tasks that reference things not defined in the plan, or plan decisions that violate the constitution.
+**Run after `/tasks`, before `/implement`.** The analyze command reads all artefacts produced so far — constitution, spec, plan, contracts, data model, and task list — and performs a **read-only consistency audit**. It makes no changes. It only reports issues.
 
-Think of it as a consistency audit before any code is written.
+Think of it as a pre-flight check before any code is written.
 
-### What analyze checks
+### What analyze looks for
 
-- Do all tasks in the task list map to something in the plan?
-- Does the plan introduce any patterns that contradict the constitution?
-- Are there acceptance criteria in the spec that have no corresponding task?
-- Are there any implicit assumptions in the plan that were never approved in the spec?
-- Are there conflicting instructions across any of the documents?
+| Check | Example issue found |
+|-------|-------------------|
+| **Duplication** | Task T04 and T08 both claim to render the staleness warning |
+| **Gaps** | Acceptance criterion 4 (WCAG) has no corresponding task |
+| **Contradictions** | Plan uses `localStorage` for caching; constitution prohibits browser storage for portfolio data |
+| **Underspecified items** | T07 references "30-day sparkline data" but contracts.md has no `SparklinePoint` type defined |
+| **Unresolved ambiguities** | Plan says "% return" but clarify session answer said "cumulative daily return" — these need to be reconciled |
+| **Constitution violations** | A new dependency introduced in the plan is not on the approved tech stack |
 
-### Example output
+### Example analyze output
 
 ```
-Agent (running analyze):
+/analyze results — specs/dashboard/
 
-Alignment issues found:
+CONFLICTS (must fix before implement):
+  1. Plan.md proposes caching portfolio data in localStorage.
+     constitution.md §4 prohibits storing portfolio data in browser storage.
+     → Update plan.md to use in-memory react-query cache only.
 
-1. CONFLICT: spec.md (section 3) requires authentication check before rendering the
-   dashboard. plan.md makes no mention of an auth guard. T01–T15 have no auth task.
-   → Add a task: "T00: Add auth guard HOC to /dashboard route"
+GAPS (acceptance criteria with no task):
+  2. spec.md criterion 4: "All interactive elements keyboard-navigable (WCAG AA)"
+     No task in tasks.md addresses this.
+     → Add task T12: Accessibility audit pass
 
-2. GAP: spec.md acceptance criterion 4 states "page must show empty state if
-   portfolio has zero funds." No task covers this empty state.
-   → Add a task: "T09b: Build EmptyPortfolio component and render when fund list is empty"
+UNDERSPECIFIED:
+  3. T07 references SparklinePoint[] but contracts.md defines no such type.
+     → Add SparklinePoint interface to contracts.md before T07 runs.
 
-3. CONSTITUTION VIOLATION: plan.md proposes using localStorage to cache portfolio data.
-   constitution.md section 4 (Security Rules) prohibits storing portfolio data in
-   browser storage.
-   → Remove caching from plan or discuss an alternative (e.g. in-memory React state)
+NO ISSUES FOUND IN: user story, functional requirements, entity model,
+tech stack selection, dependency graph.
 
-No other issues found. Resolve the 3 items above before running implement.
+Resolve 3 items above, then run /implement.
 ```
 
-You fix the three issues — update the spec, plan, or task list as needed — then proceed to implement with confidence.
+Analyze is read-only. It never modifies files. It is a safety net, not an autocorrect.
 
 ---
 
-## 7. `implement` — Execute the Task List
+## 7. `/implement` — Execute the Task List
 
-**Run after `tasks` (and `analyze` if used).** The implement command instructs the agent to begin executing the task list. The agent works through the tasks in order, implementing each one, checking it off, and moving to the next.
+**Run after `/tasks` (and `/analyze` if used).** The implement command instructs the agent to work through the task list in order and produce real code. The agent reads the constitution, spec, plan, contracts, and task list before starting. It does not improvise — it executes the spec.
 
-You do not write code. You supervise. After each task or group of tasks, you review the output against the spec and acceptance criteria.
-
-### What implement looks like in practice
+### How implement runs
 
 ```
-Prompt to agent:
-"Read constitution.md, features/dashboard/spec.md, features/dashboard/plan.md,
-and features/dashboard/tasks.md. Begin implementing the tasks in order, starting
-at T01. After completing each task, confirm it is done and state which task you
-are moving to next. Stop after completing T07 so I can review."
+/implement
+
+Agent:
+Reading: constitution.md, specs/dashboard/spec.md, specs/dashboard/plan.md,
+         specs/dashboard/contracts.md, specs/dashboard/tasks.md
+
+Starting T01 — Creating src/hooks/usePortfolio.ts
+[implements T01]
+✓ T01 complete
+
+Starting T02 — Creating src/types/portfolio.ts
+[implements T02]
+✓ T02 complete
+
+Starting T03 — Adding /dashboard route
+[implements T03]
+✓ T03 complete
+
+Wave 1 complete. Proceeding to Wave 2.
+...
 ```
 
-The agent works through T01–T07, producing real code. You review. If a task's output does not match the spec, you do not re-prompt with new instructions — you update the spec or task, and re-run implement for that task. The artefacts stay authoritative.
+### Your role during implement
+
+You are the supervisor. You:
+- Set checkpoints ("stop after Wave 2 so I can review")
+- Review each completed wave against the spec's acceptance criteria
+- Accept the output, or update the spec/task and re-run that task
+- Do not re-prompt with new requirements — update the spec instead
+
+The agent never has "creative licence" during implement. If it encounters ambiguity, it stops and asks — it does not guess. If you find yourself correcting the agent with new instructions mid-implement, that is a signal that the spec needed more detail. Update the spec. Re-run.
 
 ---
 
@@ -276,30 +452,50 @@ The agent works through T01–T07, producing real code. You review. If a task's 
 
 ### Initial project build
 
-| Step | Command | Output | Run by |
-|------|---------|--------|--------|
-| 1 | `constitution` | `constitution.md` | You + agent |
-| 2 | `specify` | `features/[name]/spec.md` | You + agent |
-| 3 | `clarify` *(optional)* | Updated `spec.md` | Agent asks, you answer |
-| 4 | `plan` | `features/[name]/plan.md` | Agent |
-| 5 | `tasks` | `features/[name]/tasks.md` | Agent |
-| 6 | `analyze` *(optional)* | Conflict report → fixes | Agent audits, you resolve |
-| 7 | `implement` | Working code | Agent builds, you supervise |
-
-### Adding a new feature (project exists)
-
-Skip `constitution` — it is already written. Start at `specify`:
-
 ```
-specify → [clarify] → plan → tasks → [analyze] → implement
+Step  Command         Output                          Who produces it
+────  ─────────────   ──────────────────────────────  ────────────────────
+1     /constitution   constitution.md                 You define principles,
+                                                      agent formalises them
+2     /specify        specs/[feat]/spec.md            You describe feature,
+                                                      agent structures it
+3     /clarify*       updated spec.md                 Agent asks, you answer
+4     /plan           plan.md, contracts.md,          Agent (you review)
+                      datamodel.md
+5     /tasks          tasks.md                        Agent (you review)
+6     /analyze*       conflict report → you fix       Agent reads, you resolve
+7     /implement      working code                    Agent builds, you supervise
+
+* optional quality gates
 ```
 
-The constitution is always in scope. Every new feature is constrained by it automatically.
+### Adding a new feature (project already exists)
+
+Skip `/constitution` — it is already written. Start at `/specify`. All 4 remaining steps are the same. The constitution constrains every new feature automatically.
 
 ---
 
-## Key Principle
+## The Mental Model: Supervisor and Builder
 
-> You are not writing code. You are writing documents that produce code.
->
-> The quality of your output is determined by the quality of your spec — not by how well you can prompt in the moment.
+| Role | Who | Responsibilities |
+|------|-----|-----------------|
+| **Supervisor / Architect** | You | Write principles (constitution), describe features (specify), answer clarifications, review plans, review tasks, accept or reject output |
+| **Builder / Agent** | Coding agent | Formalise the constitution, structure the spec, write the plan, decompose tasks, implement code — all faithfully against the spec |
+
+The agent does not co-decide on architecture. It executes your intent and flags when the spec is unclear or contradictory.
+
+> Your leverage is not writing code faster. It is writing better specs that produce correct code the first time — eliminating the ambiguity tax before it accumulates.
+
+---
+
+## Why Each Command Exists (One-Line Summary)
+
+| Command | Exists because... |
+|---------|------------------|
+| `/constitution` | Without binding principles, every feature re-invents architecture differently |
+| `/specify` | Without a written spec, intent stays implicit and the agent guesses |
+| `/clarify` | Ambiguities found at spec time cost nothing to fix; found in code review, they cost everything |
+| `/plan` | The agent needs to decide *how* before *doing* — and you need to review that decision |
+| `/tasks` | A plan is too large for one session; tasks make implementation incremental and reviewable |
+| `/analyze` | Silent contradictions between spec, plan, and tasks produce bugs that are hard to trace |
+| `/implement` | The agent executes the task list faithfully — no improvisation, no scope creep |
