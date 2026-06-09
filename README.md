@@ -64,6 +64,7 @@ Study notes are in the [`notes/`](notes/) folder, one file per study session.
 | [2026-05-13](notes/2026-05-13.md) | Gemini API (integration, streaming, image input), GenerationConfig (candidate_count, stop_sequences, max_output_tokens, temperature, top_p, top_k), generate_content vs start_chat, get_model (token limits, defaults), count_tokens |
 | [2026-05-18](notes/2026-05-18.md) | LangChain (data-aware, agentic), use cases, components (LLM wrappers, prompts, indexes, memory), chains, agents, caching (in-memory/SQLite), streaming, PromptTemplate vs ChatPromptTemplate, LCEL, tools, ReAct agent (LangChain Hub, AgentExecutor, handle_parsing_errors, tool selection) |
 | [2026-05-19](notes/2026-05-19.md) | Embeddings (what/why, similarity, cosine vs Euclidean distance), embedding applications (semantic search, clustering, recommendations, anomaly detection, diversity/MMR, classification), choosing embedding models (decision factors, MTEB), data cleaning (\n removal, chunking), cost estimation with tiktoken |
+| [2026-06-09](notes/2026-06-09.md) | RAG — question answering pipeline: prepare (load, split, embed, store), search (embed query, rank by similarity), ask (prompt with retrieved chunks, grounded LLM answer); vector databases (Qdrant, Pinecone, Milvus, pgvector, MongoDB Atlas, Elasticsearch); full end-to-end LCEL RAG chain |
 
 ---
 
